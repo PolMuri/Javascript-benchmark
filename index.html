@@ -68,7 +68,7 @@
 
             header {
                 display: flex;
-                /*Perquè posi les operacions a la cantonada superior dreta completament separada
+                /* Perquè posi les operacions a la cantonada superior dreta completament separada
                 del número de l'span que hem posat manualment */
                 justify-content: space-between;
                 font-size: 12px;
@@ -94,7 +94,7 @@
             }
 
             .code {
-                /*Així el border-radius només apareix a les cantonades de sota dels textarea
+                /* Així el border-radius només apareix a les cantonades de sota dels textarea
                 que nosaltres tenim com a classe code */
                 border-radius: 0 0 6px 6px;
             }
@@ -109,13 +109,94 @@
             padding: 6px 12px;
             transition: background .3s ease;
             width: fit-content;
-            /*Quan fem hover passarà el següent*/
+            /* Quan fem hover passarà el següent*/
             &:hover {
                 background: rgba(255, 255, 255, .5);
             }
 
         }
     </style>
+
+    <script type="module">
+        /* Recuperarem tots els elements que ens interessen */
+        // Utilitzem les variables per indentificar els elements del DOM i fer-ho més fàcil
+        const $globalCode = document.querySelector('#global') // Per recuperar el text de global que el necessitarem per iniciar el benchmark
+        const $sendbutton = document.querySelector('.send-button')
+
+        // Funció per executar el test i li passem el codi i la data que serveix per inicialitzar cada un dels casos
+        // i necessitem el codi tant de global com dels test cases per inicialitzar cada un dels casos
+        // Amb aquesta funció estem calculant el número d'operacions que fa al segon cada un dels casos
+        async function runTest({code, data}) {
+            // Especifiquem la duració
+            const duration = 1000 // és en milisegons = 1 segon
+
+            let result
+            try {
+            /* Ara calculem quantes operacions fa i hem de saber en quin punt ha d'acabar de comptar les operacions que fa
+            Executem el codi dins una eval, tot el codi serà en el client, no l'injectem a cap BD ni res, per tant l'eval aquí no és perillosa
+            Perquè qui provi codi no tingui accés la context de fora i per si es asincron el codi
+            ho embolcallarem tot en una funció asincrona i ho autoexecutem
+            L'eval ens permet evaluar una cadena de text i l'executa com si fos codi JS, però és perillós perquè es podria permetre que un usuari guardi codi a una BD 
+            i que estigui injectant codi. En aquest cas és en el client per tant no és perillós*/
+            result = await eval(`(async () => { 
+                // Perquè no colisioni amb el que injectem a data, posem aquests noms de variables
+                let PERF__ops = 0;
+                let PERF__start = Date.now(); // El Date.now ens el dona en milisegons 
+                let PERF__end = Date.now() + ${duration};
+                // Aquí injectem la data que ha d'estar fóra del bucle
+                ${data};
+
+              while (Date.now() < PERF__end) {
+                // Comptarem cada una de les operacions del codi que executi en un segon
+                ${code};
+                PERF__ops++
+                }
+                return PERF__ops
+            })()`) // Això s'anomena IIFE -> Inmediately Invoked Function Expression que és crear una funció i executar-la al invocar-la
+            } catch (error) {
+
+            }
+
+            // Per saber quantes operacions hem fet per segon return result * (1000 / duration), però com que 1000 és 1 segon retornem el resultat
+            return result;
+            
+            
+        }
+    
+        // Funció per executar tots els casos
+        async function runTestCases(params) {
+            const $testCases = document.querySelectorAll('.test-case') // Recuperem tots els elements test-case
+            // Aquí és un ocorre tot, primer recuperarem el codi global que injectem a cada un dels casos
+            const globalCode = $globalCode.value
+
+            // Per cada un dels casos que tenim, s'ha d'executar
+            $testCases.forEach(async testCase => {
+                // Primer de tot recuperem el codi que és l'element classe "code" al textarea
+                // No fa falta utilitzar sempre document.querySelector ja que una vegada recuperem un element del document podem fer 
+                // un querySelector d'aquell element del document així no busquem en tot el document
+                // Així dins de la classe test-cases podem buscar les altres classes
+                const $code = testCase.querySelector('.code')
+                const $ops = testCase.querySelector('.ops')
+
+                // Recuperem el codi de la textarea just abans de començar el test
+                const codeValue = $code.value
+                // Abans d'executar els test posarem això on van les operacions per segon, ja que no té sentit posar operacions per segon
+                // si encar ano s'han fet els test
+                $ops.textContent = 'Loading...'
+
+                const result = await runTest({code: codeValue, data: globalCode}) // Await espera el resultat de la funció asíncrona
+                console.log(result)
+            })
+            
+        }
+        // Per executar els test-cases al iniciar
+        runTestCases()
+
+        // Cada vegada que s'apreti el botó farem un "run" del test-cases
+        $sendbutton.addEventListener('click', () => {
+            runTestCases()
+        })
+    </script>
 </head>
 <body>
     <main class="container">
