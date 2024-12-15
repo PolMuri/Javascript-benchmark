@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Benchmark</title>
+    <style>
+        *, *::before, *::after{
+            /* Perquè el padding compti com a amplada*/
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+            Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: #1e1e1e;
+            color: #fff;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .container{
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 1280px;
+            margin: auto;
+
+            h2 {
+                font-size: 12px;
+                opacity: .5;
+                font-weight: 500;
+                margin: 0;
+                padding: o;
+            }
+        }
+
+        .code {
+            background: #141414;
+            border-radius: 6px;
+            border: 0;
+            color: #d4d4d4;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 8px;
+            /* El resize none és perquè l'usuari no pugui canviar i moure el tamany
+            de la finestra del textarea que porta com a nom de classe code*/
+            resize: none;
+            width: 100%;
+            /* És una propietat nova en CSS que al apretar enter al textarea es fa gran
+            de forma automàtica ja que s'adapta al contingut i així no ens cal el resize
+            i s'adapta al contingut de forma automàtica*/
+            field-sizing: content;
+
+        }
+
+        .test-cases {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .test-case {
+            background: #2a2a2a;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+
+            header {
+                display: flex;
+                /*Perquè posi les operacions a la cantonada superior dreta completament separada
+                del número de l'span que hem posat manualment */
+                justify-content: space-between;
+                font-size: 12px;
+                padding: 8px;
+                align-items: center;
+
+                .test-id {
+                    border-radius: 100%;
+                    background: #141414;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    color: rgba(255, 255, 255, .7);
+                }
+
+                .ops {
+                    opacity: .5;
+                    font-size: 9px;
+                }
+            }
+
+            .code {
+                /*Així el border-radius només apareix a les cantonades de sota dels textarea
+                que nosaltres tenim com a classe code */
+                border-radius: 0 0 6px 6px;
+            }
+        }
+
+        .send-button {
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .3);
+            border: 0;
+            color: white;
+            cursor: pointer;
+            padding: 6px 12px;
+            transition: background .3s ease;
+            width: fit-content;
+            /*Quan fem hover passarà el següent*/
+            &:hover {
+                background: rgba(255, 255, 255, .5);
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h2>Global</h2>
+        <textarea id="global" class="code" rows="1">const data = [...Array
+            (1000).keys()]</textarea>
+
+        <h2>Test cases</h2>
+        <div class="test-cases">
+            <article class="test-case">
+                <header>
+                    <span class="test-id">1</span>
+                    <spanz class="ops">203, 360 ops/s</spanz>
+                </header>
+
+                <textarea id="global" class="code" rows="1">data.find(x => x == 100)</textarea>
+            </article>
+
+            <article class="test-case">
+                <header>
+                    <span class="test-id">2</span>
+                    <spanz class="ops">150, 360 ops/s</spanz>
+                </header>
+                
+                <textarea id="global" class="code" rows="1">data.find(x => x == 200)</textarea>
+            </article>
+
+            <article class="test-case">
+                <header>
+                    <span class="test-id">3</span>
+                    <spanz class="ops">100, 360 ops/s</spanz>
+                </header>
+                
+                <textarea id="global" class="code" rows="1">data.find(x => x == 400)</textarea>
+            </article>
+
+            <article class="test-case">
+                <header>
+                    <span class="test-id">4</span>
+                    <spanz class="ops">50, 360 ops/s</spanz>
+                </header>
+                
+                <textarea id="global" class="code" rows="1">data.find(x => x == 800)</textarea>
+            </article>
+        </div>
+
+        <button class="send-button">Test code! </button>
+    </main>
+</body>
+</html>
