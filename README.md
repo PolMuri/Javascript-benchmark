@@ -77,7 +77,7 @@ How to Start
 
 Clone the repository:
 
-git clone https://github.com/your-username/js-benchmark.git
+git clone [https://github.com/your-username/js-benchmark.git](https://github.com/PolMuri/Javascript-benchmark.git)
 
 Navigate to the project directory:
 
